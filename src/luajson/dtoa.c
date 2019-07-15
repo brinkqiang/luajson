@@ -185,6 +185,7 @@
  *	used for input more than STRTOD_DIGLIM digits long (default 40).
  */
 
+#ifdef USE_INTERNAL_FPCONV
 #include "dtoa_config.h"
 
 #ifndef Long
@@ -4355,4 +4356,6 @@ dtoa
 	}
 #ifdef __cplusplus
 }
+#endif
+
 #endif

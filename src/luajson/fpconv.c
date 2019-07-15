@@ -27,6 +27,7 @@
  *
  * fpconv_* will around these issues with a translation buffer if required.
  */
+#ifndef USE_INTERNAL_FPCONV
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -203,3 +204,4 @@ void fpconv_init()
 
 /* vi:ai et sw=4 ts=4:
  */
+#endif

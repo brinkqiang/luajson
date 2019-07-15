@@ -21,6 +21,7 @@
  * it suffices to declare buf
  *	char buf[32];
  */
+#ifdef USE_INTERNAL_FPCONV
 
 #ifdef __cplusplus
 extern "C" {
@@ -109,3 +110,4 @@ fpconv_g_fmt(char *b, double x, int precision)
 #endif
 	return b - b0;
 	}
+#endif

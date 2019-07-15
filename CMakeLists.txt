@@ -16,6 +16,9 @@ MESSAGE(STATUS "VERSION: ${LUAJSON_VERSION}")
 ADD_DEFINITIONS(-DUSE_LUAJSON)
 ADD_DEFINITIONS(-DLUA_COMPAT_MODULE -DLUA_COMPAT_APIINTCASTS)
 
+option(USE_INTERNAL_FPCONV "Use internal strtod() / g_fmt() code for performance" ON)
+option(MULTIPLE_THREADS "Support multi-threaded apps with internal fpconv - recommended" ON)
+
 IF(MSVC)
     ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
     ADD_DEFINITIONS(-Dinline=__inline)
@@ -27,6 +30,31 @@ OPTION(USE_LUA_INNER "use lua inner" ON)
 OPTION(USE_LUAJSON_TEST "use luajson test" ON)
 
 #ModuleImport("dmlog" "thirdparty/dmlog")
+
+if(NOT USE_INTERNAL_FPCONV)
+    # Use libc number conversion routines (strtod(), sprintf())
+    set(FPCONV_SOURCES fpconv.c)
+else()
+    # Use internal number conversion routines
+    add_definitions(-DUSE_INTERNAL_FPCONV)
+    set(FPCONV_SOURCES g_fmt.c dtoa.c)
+
+    include(TestBigEndian)
+    TEST_BIG_ENDIAN(IEEE_BIG_ENDIAN)
+    if(IEEE_BIG_ENDIAN)
+        add_definitions(-DIEEE_BIG_ENDIAN)
+    endif()
+
+    if(MULTIPLE_THREADS)
+        set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+        find_package(Threads REQUIRED)
+        if(NOT CMAKE_USE_PTHREADS_INIT)
+            message(FATAL_ERROR
+                    "Pthreads not found - required by MULTIPLE_THREADS option")
+        endif()
+        add_definitions(-DMULTIPLE_THREADS)
+    endif()
+endif()
 
 IF (WIN32)
     INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/src/windows)
