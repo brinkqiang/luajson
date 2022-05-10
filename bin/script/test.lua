@@ -5,7 +5,9 @@ local json = require('luajson')
 local foo = {
 	test = 'hello',
 	test2 = 12345678987654321,
-	test3 = 1434.23988823
+	test3 = 1434.23988823,
+	test4 = -12345678987654321,
+	test5 = -1434.23988823,
 }
 
 local str = json.encode(foo)
