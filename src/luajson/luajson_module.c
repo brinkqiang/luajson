@@ -1318,8 +1318,8 @@ static void json_process_value(lua_State* l, json_parse_t* json,
 
         char* endptr = NULL;
         double num = fpconv_strtod(token->value.string, &endptr);
-
-        if (0 == strncasecmp(szBuf, token->value.string, endptr - token->value.string))
+        int len = endptr - token->value.string;
+        if (0 == strncasecmp(szBuf, token->value.string, len))
         {
             lua_pushinteger(l, inter);
         }
