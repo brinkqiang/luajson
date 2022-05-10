@@ -1073,7 +1073,9 @@ static void json_next_number_token(json_parse_t* json, json_token_t* token)
     char* endptr;
 
     token->type = T_NUMBER;
-    token->value.number = fpconv_strtod(json->ptr, &endptr);
+    token->value.string = json->ptr;
+
+    double number = fpconv_strtod(json->ptr, &endptr);
     if (json->ptr == endptr)
         json_set_token_error(token, json, "invalid number");
     else
@@ -1309,8 +1311,22 @@ static void json_process_value(lua_State* l, json_parse_t* json,
         lua_pushlstring(l, token->value.string, token->string_len);
         break;;
     case T_NUMBER:
-        lua_pushnumber(l, token->value.number);
-        break;;
+    {
+        long long num = atoll(token->value.string);
+        char szBuf[64] = { 0 };
+        sprintf(szBuf, "%lld", num);
+
+        if (0 == strncasecmp(szBuf, token->value.string, strlen(szBuf)))
+        {
+            lua_pushinteger(l, num);
+        }
+        else
+        {
+            char* endptr;
+            lua_pushnumber(l, fpconv_strtod(token->value.string, &endptr));
+        }
+    }
+    break;
     case T_BOOLEAN:
         lua_pushboolean(l, token->value.boolean);
         break;;
@@ -1329,7 +1345,6 @@ static void json_process_value(lua_State* l, json_parse_t* json,
         json_throw_parse_error(l, json, "value", token);
     }
 }
-
 static int json_decode(lua_State* l)
 {
     json_parse_t json;
