@@ -1070,7 +1070,7 @@ static int json_is_invalid_number(json_parse_t* json)
 
 static void json_next_number_token(json_parse_t* json, json_token_t* token)
 {
-    char* endptr;
+    char* endptr = NULL;
 
     token->type = T_NUMBER;
     token->value.string = json->ptr;
@@ -1312,18 +1312,20 @@ static void json_process_value(lua_State* l, json_parse_t* json,
         break;;
     case T_NUMBER:
     {
-        long long num = atoll(token->value.string);
+        long long inter = atoll(token->value.string);
         char szBuf[64] = { 0 };
-        sprintf(szBuf, "%lld", num);
+        sprintf(szBuf, "%lld", inter);
 
-        if (0 == strncasecmp(szBuf, token->value.string, strlen(szBuf)))
+        char* endptr = NULL;
+        double num = fpconv_strtod(token->value.string, &endptr);
+
+        if (0 == strncasecmp(szBuf, token->value.string, endptr - token->value.string))
         {
-            lua_pushinteger(l, num);
+            lua_pushinteger(l, inter);
         }
         else
         {
-            char* endptr;
-            lua_pushnumber(l, fpconv_strtod(token->value.string, &endptr));
+            lua_pushnumber(l, num);
         }
     }
     break;
