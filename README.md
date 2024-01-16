@@ -71,6 +71,5 @@ print(json.encode(nil))
 print(json.encode {{a=1},{b=2}})
 ```
 ## Contacts
-[![Join the chat](https://badges.gitter.im/brinkqiang/luajson/Lobby.svg)](https://gitter.im/brinkqiang/luajson)
 
 ## Thanks
